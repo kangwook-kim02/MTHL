@@ -100,7 +100,7 @@ def main ():
 
     # Train RF Model
     print("Training the model ...")
-    clf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, n_jobs = -1, max_features="auto")
+    clf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, n_jobs = -1, max_features="sqrt")
     clf.fit(X_train_scaled, ytrain)
 
     # Output accuracy of classifier

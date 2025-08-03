@@ -15,7 +15,7 @@ from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 from keras.utils import plot_model
 from keras.models import Sequential, Model, model_from_json
-from keras.layers import Input, Dense, Dropout, Embedding, LSTM, concatenate, Flatten, Conv1D, GlobalMaxPooling1D
+from keras.layers import Input, Dense, Dropout, Embedding, LSTM, concatenate, Flatten, Conv1D, GlobalMaxPooling1D, Reshape,BatchNormalization, ReLU
 
 TLS , DNS, HTTP = {}, {}, {}
 TLS['tlsOnly'] = False # returns
@@ -38,11 +38,25 @@ def one_hot(y_, n_classes=7):
     return np.eye(n_classes)[np.array(y_, dtype=np.int32)]  # Returns FLOATS
 
 
-def createModel(X_train, OUTPUT, filters=250, kernel_size=3, dropout_rate=0., CNN_layers=2, clf_reg=1e-4):
+def createModel(X_train, OUTPUT, filters=16, kernel_size=3, dropout_rate=0., CNN_layers=2, clf_reg=1e-4):
     # Model Definition
     OUTPUTS = []
-    #raw_inputs = Input(shape=(X_train.shape[1]))
     raw_inputs = Input(shape=(X_train.shape[1],))
+    xcnn = Reshape((121, 1))(raw_inputs)
+    
+    
+    # input block
+    xcnn = BatchNormalization()(xcnn)
+    xcnn = Conv1D(filters, (kernel_size), padding='valid', strides=2) # #filter : 16, stride = 2 이어야 (121,1) --> (61,16이 나올 수 있음) 
+    xcnn = ReLU()(xcnn)
+    xcnn = BatchNormalization()(xcnn)
+    
+    # Residual block
+    residual_xcnn = xcnn
+    
+    # output block
+    
+    
     xcnn = Embedding(1000, 50, input_length=121)(raw_inputs)  
     xcnn = Conv1D(filters, (kernel_size), padding='valid', activation='relu', strides=1)(xcnn)    
     if dropout_rate != 0:
@@ -53,7 +67,7 @@ def createModel(X_train, OUTPUT, filters=250, kernel_size=3, dropout_rate=0., CN
                     (kernel_size),
                     padding='valid',
                     activation='relu',
-                    strides=1)(raw_inputs)
+                    strides=1)(xcnn)
     if dropout_rate != 0:
         xcnn = Dropout(dropout_rate)(xcnn)  
 

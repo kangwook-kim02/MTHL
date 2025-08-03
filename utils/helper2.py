@@ -352,7 +352,7 @@ def plot_confusion_matrix(directory, y_true, y_pred, classes, normalize=False, t
                         color="white" if cm[i, j] > thresh[i] else "black")
 
     fig.tight_layout()
-    fig.savefig(directory+"/CM.png", bbox_inches='tight')
+    fig.savefig(directory+"/CM.png", bbox_inches='tight',dpi=300) # dpi 300 추가 (화질 개선) 20250730 kangwook kim
     print("Confusion matrix is saved as .{}/CM.png\n".format(directory[directory.find("/results"):]))
 
     return ax, cm

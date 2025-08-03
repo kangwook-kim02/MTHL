@@ -5,6 +5,8 @@ import pandas as pd
 
 from sklearn import preprocessing
 from sklearn.svm import SVC
+from sklearn.svm import LinearSVC # 학습 속도 느림 --> 단순 비교용이기 때문에 LinearSVC 사용
+from sklearn.decomposition import PCA 
 from sklearn.model_selection import train_test_split
 
 from utils.helper2 import *
@@ -95,12 +97,16 @@ def main ():
 
     # Preprocess the data
     scaler = preprocessing.StandardScaler()
+    # pca = PCA(n_components=30) # 20250731 수정 kangwook kim
     X_train_scaled = scaler.fit_transform(Xtrain)
     X_val_scaled = scaler.transform(Xval)
+    # X_train_scaled = pca.fit_transform(Xtrain)
+    # X_val_scaled = pca.transform(Xval)
 
     # Train RF Model
     print("Training the model ...")
-    clf = SVC(C=1.0, kernel='rbf', decision_function_shape='ovr', tol=1e-3, max_iter = 100000, random_state=42, verbose=True)
+    # clf = SVC(C=1.0, kernel='rbf', decision_function_shape='ovr', tol=1e-2, max_iter = 100000, random_state=42, verbose=True)
+    clf = LinearSVC(C=1.0, tol=1e-2, max_iter = 1000, random_state=42, verbose=True)
     clf.fit(X_train_scaled, ytrain)
 
     # Output accuracy of classifier
